@@ -63,3 +63,4 @@ def smart_click(driver, element_id):
             
         print("SUCCESS: 'cleaned_dom.txt' has been created.")
         return "HEALING_READY"
+
