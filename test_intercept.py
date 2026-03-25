@@ -1,3 +1,4 @@
+
 import os
 import time
 from selenium import webdriver
@@ -43,4 +44,3 @@ except Exception as e:
 finally:
     # Keep the browser open for 3 seconds so you can see it work, then close
     time.sleep(3)
-    driver.quit()
