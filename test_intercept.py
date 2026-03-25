@@ -1,21 +1,46 @@
-from selenium import webdriver
-from interceptor import smart_click # This imports your Step 2 & 3 code
 import os
+import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
-# Setup Chrome (Selenium 4 manages the driver automatically)
+# Importing Cheshta's LLM Connector Brain
+from ai_healer import get_new_locator
+
+# 1. Start the Execution Engine (The Browser)
+print("Starting AuraTest Execution Engine...")
 driver = webdriver.Chrome()
 
-try:
-    # Get the absolute path of your local HTML file
-    file_path = "file://" + os.path.abspath("test_site.html")
-    driver.get(file_path)
+# Get the absolute path to your test.html file
+file_path = "file://" + os.path.abspath("test.html")
+driver.get(file_path)
 
-    # TEST CASE: Try to click an ID that IS NOT in the HTML
-    # This should trigger your 'except' block and 'page_source' capture
-    result = smart_click(driver, "fake-button-id")
+# 2. The Interceptor Logic
+try:
+    # 💥 THE CRASH: We intentionally look for an ID that doesn't exist
+    print("\nAttempting to click the old ID: 'old-button'")
+    driver.find_element(By.ID, "old-button").click()
+    print("Success on first try!")
+
+except Exception as e:
+    print("\n🚨 CRASH DETECTED! Activating Interceptor...")
     
-    if result:
-        print("Test Passed: Interceptor caught the error and captured the DOM.")
+    # Step A: Grab the current webpage HTML
+    broken_html = driver.page_source
+    
+    # Step B: Call the LLM Connector
+    print("Asking AI for the fix...")
+    # We pass the broken HTML and the ID we *tried* to find
+    new_id = get_new_locator(broken_html, "old-button")
+    
+    # Step C: The Recovery
+    if new_id != "NOT_FOUND":
+        print(f"✅ AI found the new ID: {new_id}. Resuming test!")
+        driver.find_element(By.ID, new_id).click()
+        print("🎉 Test Successfully Healed!")
+    else:
+        print("❌ AI could not find the button. Test failed.")
 
 finally:
+    # Keep the browser open for 3 seconds so you can see it work, then close
+    time.sleep(3)
     driver.quit()
