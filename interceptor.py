@@ -63,7 +63,17 @@ def smart_click(driver, element_id):
             # The retry action
             driver.find_element(By.ID, clean_locator).click() 
             print("Action clicked successfully using AI locator!")
+             
+            # ADD THIS: Save a report for the UI
+            with open("healing_report.txt", "w") as report:
+                report.write(f"STATUS: HEALED\n")
+                report.write(f"OLD_ID: {element_id}\n")
+                report.write(f"NEW_ID: {clean_locator}\n")
+                report.write(f"TIMESTAMP: {time.strftime('%Y-%m-%d %H:%M:%S')}")
             
         else:
             print("Fatal Error: AI could not find a replacement. Failing test.")
             raise # Let the test crash gracefully if the AI can't fix it
+# ... existing code ...
+            
+           
